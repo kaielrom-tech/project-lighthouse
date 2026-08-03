@@ -1,10 +1,6 @@
 import OpenAI from "openai";
 import { NextRequest, NextResponse } from "next/server";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 type ChatMessage = {
   role: "user" | "assistant";
   content: string;
@@ -12,6 +8,17 @@ type ChatMessage = {
 
 export async function POST(request: NextRequest) {
   try {
+    const apiKey = process.env.OPENAI_API_KEY;
+
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: "Server is missing the OpenAI API key. Check your .env.local file." },
+        { status: 500 }
+      );
+    }
+
+    const openai = new OpenAI({ apiKey });
+
     const body = await request.json();
     const messages: ChatMessage[] = body.messages;
 
@@ -19,13 +26,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "Please send at least one message." },
         { status: 400 }
-      );
-    }
-
-    if (!process.env.OPENAI_API_KEY) {
-      return NextResponse.json(
-        { error: "Server is missing the OpenAI API key. Check your .env.local file." },
-        { status: 500 }
       );
     }
 
@@ -220,7 +220,12 @@ Every response should leave the student feeling more confident, more capable, an
 
     return NextResponse.json({ reply });
   } catch (error) {
-    console.error("Chat API error:", error);
+    const err = error instanceof Error ? error : new Error(String(error));
+    console.error("Chat API error:", {
+      message: err.message,
+      cause: err.cause,
+      stack: err.stack,
+    });
     return NextResponse.json(
       {
         error:
