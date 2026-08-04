@@ -22,12 +22,39 @@ const EXAMPLE_QUESTIONS = [
   { emoji: "🏛️", text: "What caused the Civil War?" },
 ] as const;
 
+const GRADES = [
+  { value: "1", label: "Grade 1" },
+  { value: "2", label: "Grade 2" },
+  { value: "3", label: "Grade 3" },
+  { value: "4", label: "Grade 4" },
+  { value: "5", label: "Grade 5" },
+  { value: "6", label: "Grade 6" },
+  { value: "7", label: "Grade 7" },
+  { value: "8", label: "Grade 8" },
+  { value: "9", label: "Grade 9" },
+  { value: "10", label: "Grade 10" },
+  { value: "11", label: "Grade 11" },
+  { value: "12", label: "Grade 12" },
+] as const;
+
+const EXPLANATION_STYLES = [
+  { value: "simple", label: "Simple" },
+  { value: "normal", label: "Normal" },
+  { value: "advanced", label: "Advanced" },
+] as const;
+
+type Grade = (typeof GRADES)[number]["value"];
+type ExplanationStyle = (typeof EXPLANATION_STYLES)[number]["value"];
+
 export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [canRetry, setCanRetry] = useState(false);
+  const [grade, setGrade] = useState<Grade>("8");
+  const [explanationStyle, setExplanationStyle] =
+    useState<ExplanationStyle>("normal");
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -55,7 +82,11 @@ export default function Home() {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: nextMessages }),
+        body: JSON.stringify({
+          messages: nextMessages,
+          grade,
+          explanationStyle,
+        }),
       });
 
       const data = await response.json();
@@ -165,11 +196,11 @@ export default function Home() {
           aria-labelledby="hero-heading"
         >
           <h1 id="hero-heading" className={styles.headline}>
-            Understand school. Don&apos;t just finish it.
+            Learn it clearly. Remember it longer.
           </h1>
           <p className={styles.subhead}>
-            Project Lighthouse explains difficult topics clearly, step by step,
-            so you can actually understand what you are learning.
+            Project Lighthouse explains difficult school topics step by step,
+            using clear examples and guidance matched to your grade level.
           </p>
 
           <h2 className={styles.promptHeading}>
@@ -177,6 +208,47 @@ export default function Home() {
           </h2>
 
           <form className={styles.composer} onSubmit={handleSubmit}>
+            <div className={styles.settingsRow}>
+              <label className={styles.settingField} htmlFor="grade-select">
+                <span className={styles.settingLabel}>Grade</span>
+                <select
+                  id="grade-select"
+                  className={styles.settingSelect}
+                  value={grade}
+                  onChange={(e) => setGrade(e.target.value as Grade)}
+                  disabled={isLoading}
+                >
+                  {GRADES.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label
+                className={styles.settingField}
+                htmlFor="explanation-select"
+              >
+                <span className={styles.settingLabel}>Explanation</span>
+                <select
+                  id="explanation-select"
+                  className={styles.settingSelect}
+                  value={explanationStyle}
+                  onChange={(e) =>
+                    setExplanationStyle(e.target.value as ExplanationStyle)
+                  }
+                  disabled={isLoading}
+                >
+                  {EXPLANATION_STYLES.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
             <label htmlFor="question" className={styles.visuallyHidden}>
               Ask a school question
             </label>

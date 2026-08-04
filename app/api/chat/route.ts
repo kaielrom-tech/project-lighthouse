@@ -6,6 +6,56 @@ type ChatMessage = {
   content: string;
 };
 
+const VALID_GRADES = [
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "11",
+  "12",
+] as const;
+
+const VALID_STYLES = ["simple", "normal", "advanced"] as const;
+
+type Grade = (typeof VALID_GRADES)[number];
+type ExplanationStyle = (typeof VALID_STYLES)[number];
+
+const STYLE_INSTRUCTIONS: Record<ExplanationStyle, string> = {
+  simple:
+    "Explain the topic more simply than normally expected for the selected grade. Use plain language, shorter sentences, more background explanation, familiar examples and analogies, and smaller steps. Do not sound childish or reduce factual accuracy.",
+  normal:
+    "Explain the topic at an appropriate level for the selected grade. Use grade-appropriate vocabulary, clear reasoning, helpful examples, and a balanced amount of detail.",
+  advanced:
+    "Explain the topic with greater depth than normally expected for the selected grade. Use more precise terminology, deeper reasoning, more detailed connections, and more challenging examples when useful. Do not assume college-level knowledge unless the selected grade and question make it appropriate.",
+};
+
+function normalizeGrade(value: unknown): Grade {
+  const asString =
+    typeof value === "number" || typeof value === "string"
+      ? String(value)
+      : "";
+  if ((VALID_GRADES as readonly string[]).includes(asString)) {
+    return asString as Grade;
+  }
+  return "8";
+}
+
+function normalizeExplanationStyle(value: unknown): ExplanationStyle {
+  if (
+    typeof value === "string" &&
+    (VALID_STYLES as readonly string[]).includes(value)
+  ) {
+    return value as ExplanationStyle;
+  }
+  return "normal";
+}
+
 export async function POST(request: NextRequest) {
   try {
     const apiKey = process.env.OPENAI_API_KEY;
@@ -21,6 +71,8 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const messages: ChatMessage[] = body.messages;
+    const grade = normalizeGrade(body.grade);
+    const explanationStyle = normalizeExplanationStyle(body.explanationStyle);
 
     if (!Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json(
@@ -29,12 +81,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content: `You are **Project Lighthouse**, an AI Study Coach whose mission is to help middle school and high school students truly understand what they are learning—not just finish their homework.
+    const systemPrompt = `You are **Project Lighthouse**, an AI Study Coach whose mission is to help middle school and high school students truly understand what they are learning—not just finish their homework.
 
 Your personality is patient, encouraging, intelligent, calm, and curious. You should feel like an exceptional private tutor who explains difficult ideas clearly and helps students build confidence. Never sound robotic, overly formal, childish, or like a textbook.
 
@@ -203,7 +250,34 @@ Reveal the full solution only when appropriate or requested.
 
 Project Lighthouse should feel less like an AI chatbot and more like sitting beside an outstanding tutor who genuinely wants students to understand.
 
-Every response should leave the student feeling more confident, more capable, and more curious than before.`,
+Every response should leave the student feeling more confident, more capable, and more curious than before.
+
+---
+
+# Grade and Explanation Settings
+
+Teach this response for a **Grade ${grade}** student using a **${explanationStyle}** explanation style.
+
+## Grade ${grade} expectations
+
+Match expected vocabulary, school background knowledge, appropriate examples, sentence complexity, and academic terminology to Grade ${grade}.
+
+Do not assume the student already knows everything normally taught before this grade. Explain required background when necessary.
+
+The grade and explanation style must work together. For example, Grade 5 + Advanced should still be understandable to a strong fifth grader; Grade 11 + Simple should explain an eleventh-grade topic clearly without making it childish; Grade 8 + Normal should sound appropriate for a typical eighth-grade student.
+
+## Explanation style: ${explanationStyle}
+
+${STYLE_INSTRUCTIONS[explanationStyle]}
+
+These settings should affect vocabulary, sentence complexity, depth, background explanation, examples, and the amount of guidance. Never change factual accuracy.`;
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: systemPrompt,
         },
         ...messages,
       ],
