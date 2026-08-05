@@ -1,24 +1,87 @@
 :root {
-  --color-bg: #f4f8fc;
-  --color-bg-soft: #eaf2f9;
+  /* Core surfaces */
+  --color-bg: #f6f9fc;
   --color-surface: #ffffff;
-  --color-navy: #0f2744;
-  --color-navy-soft: #1e3a5f;
-  --color-muted: #5a6f86;
-  --color-border: #d5e2ef;
-  --color-accent: #2b6cb0;
-  --color-accent-hover: #245a96;
-  --color-accent-soft: #e8f1fa;
-  --color-glow: rgba(56, 130, 193, 0.18);
-  --color-error-bg: #fff6f5;
+  --color-surface-soft: #f0f6ff;
+  --color-surface-hover: #e8f1ff;
+  --color-pale: #f6f9fc;
+  --color-sky: #f0f6ff;
+  --color-bg-soft: #f0f6ff;
+
+  /* Text */
+  --color-heading: #102a43;
+  --color-navy: #102a43;
+  --color-navy-soft: #243b53;
+  --color-text: #3f5368;
+  --color-slate: #3f5368;
+  --color-muted: #718096;
+
+  /* Primary actions */
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-pressed: #1e40af;
+  --color-primary-soft: #eaf2ff;
+  --color-accent: #2563eb;
+  --color-accent-hover: #1d4ed8;
+  --color-accent-soft: #eaf2ff;
+  --color-glow: rgba(37, 99, 235, 0.12);
+
+  /* Borders */
+  --color-border: #dbe6f1;
+  --color-border-strong: #c7d7e8;
+
+  /* Status */
+  --color-success: #16856b;
+  --color-success-bg: #e7f7f3;
+  --color-success-border: #b6e5d8;
+  --color-warning: #c77d0a;
+  --color-warning-bg: #fff8eb;
+  --color-warning-border: #efd7a8;
+  --color-error: #c24141;
+  --color-error-bg: #fff5f5;
   --color-error-border: #f0c4c0;
-  --color-error-text: #9b3b34;
-  --shadow-soft: 0 8px 28px rgba(15, 39, 68, 0.06);
-  --shadow-card: 0 2px 10px rgba(15, 39, 68, 0.05);
+  --color-error-text: #c24141;
+
+  /* Subject accents — tiny labels / thin lines only */
+  --subject-math: #2563eb;
+  --subject-reading: #c47b16;
+  --subject-writing: #7c3aed;
+  --subject-science: #159a6c;
+  --subject-history: #a65c26;
+  --subject-general: #148a91;
+
+  /* Elevation */
+  --shadow-xs: 0 1px 2px rgba(16, 42, 67, 0.05);
+  --shadow-sm: 0 4px 14px rgba(16, 42, 67, 0.07);
+  --shadow-md: 0 12px 30px rgba(16, 42, 67, 0.1);
+  --shadow-soft: var(--shadow-sm);
+  --shadow-card: var(--shadow-xs);
+
+  /* Radii */
+  --radius-sm: 8px;
+  --radius-md: 12px;
   --radius-lg: 18px;
-  --radius-md: 14px;
-  --radius-sm: 10px;
+  --radius-xl: 24px;
+  --radius-control: 12px;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast: 160ms;
+  --duration: 180ms;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
   --max-width: 720px;
+  --max-width-app: 880px;
+  --focus-ring: 0 0 0 4px rgba(37, 99, 235, 0.12);
 }
 
 * {
@@ -33,16 +96,62 @@ html {
 
 body {
   font-family: var(--font-body), "Segoe UI", sans-serif;
+  font-size: 16px;
   line-height: 1.6;
-  color: var(--color-navy);
-  background: var(--color-bg);
+  color: var(--color-text);
+  background:
+    radial-gradient(1200px 480px at 12% -10%, rgba(37, 99, 235, 0.06), transparent 55%),
+    radial-gradient(900px 420px at 92% 0%, rgba(20, 138, 145, 0.05), transparent 50%),
+    var(--color-bg);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
 }
 
+h1,
+h2,
+h3,
+h4 {
+  color: var(--color-heading);
+  line-height: 1.25;
+}
+
+p {
+  color: var(--color-text);
+}
+
 button,
-textarea {
+textarea,
+input,
+select {
   font: inherit;
+}
+
+button {
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* Shared select chevron treatment */
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' viewBox='0 0 16 16'%3E%3Cpath stroke='%23718096' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+  background-size: 16px;
+  padding-right: 2.4rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -56,5 +165,9 @@ textarea {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  button {
+    transform: none !important;
   }
 }

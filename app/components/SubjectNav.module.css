@@ -1,0 +1,118 @@
+.nav {
+  width: 100%;
+  margin: 0 auto var(--space-5);
+}
+
+.row {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding: 0.15rem 0.1rem var(--space-2);
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex: 0 0 auto;
+  min-height: 42px;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: var(--shadow-xs);
+  border-color: var(--color-border);
+}
+
+.button:hover:not(:disabled) {
+  background: var(--color-surface-hover);
+  color: var(--color-heading);
+  border-color: var(--color-border-strong);
+}
+
+.button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.buttonActive {
+  background: var(--color-surface);
+  border-color: color-mix(in srgb, var(--subject-color, var(--color-primary)) 35%, var(--color-border));
+  color: var(--color-heading);
+  box-shadow: var(--shadow-sm);
+  font-weight: 650;
+}
+
+.buttonActive::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--subject-color, var(--color-primary));
+  margin-left: 0.1rem;
+}
+
+.icon {
+  display: inline-flex;
+  color: var(--subject-color, var(--color-muted));
+  flex-shrink: 0;
+}
+
+.label {
+  line-height: 1.2;
+}
+
+.button[data-subject="all"],
+.icon[data-subject="all"] {
+  --subject-color: var(--color-navy-soft);
+}
+
+.button[data-subject="math"],
+.icon[data-subject="math"] {
+  --subject-color: var(--subject-math);
+}
+
+.button[data-subject="reading"],
+.icon[data-subject="reading"] {
+  --subject-color: var(--subject-reading);
+}
+
+.button[data-subject="writing"],
+.icon[data-subject="writing"] {
+  --subject-color: var(--subject-writing);
+}
+
+.button[data-subject="science"],
+.icon[data-subject="science"] {
+  --subject-color: var(--subject-science);
+}
+
+.button[data-subject="history"],
+.icon[data-subject="history"] {
+  --subject-color: var(--subject-history);
+}
+
+.button[data-subject="general"],
+.icon[data-subject="general"] {
+  --subject-color: var(--subject-general);
+}
+
+@media (min-width: 720px) {
+  .row {
+    flex-wrap: wrap;
+    justify-content: center;
+    overflow: visible;
+    padding-bottom: 0;
+  }
+}
